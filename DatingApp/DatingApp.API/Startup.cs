@@ -21,6 +21,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using AutoMapper;
+using System.Text.Json.Serialization;
 
 namespace DatingApp.API
 {
@@ -37,11 +38,15 @@ namespace DatingApp.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DeafultConnection")));
-            services.AddControllers();
+            services.AddControllers()
+            .AddJsonOptions(options =>
+           options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+        ;
             services.AddCors();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddAutoMapper(typeof(DatingRepository).Assembly);
             services.AddMvc(option => option.EnableEndpointRouting = false);
+            services.AddTransient<Seed>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IDatingRepository, DatingRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -56,6 +61,8 @@ namespace DatingApp.API
                         ValidateAudience = false
                     };
                 });
+            Console.WriteLine("I am callled");
+            services.AddScoped<LogUserActivity>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
