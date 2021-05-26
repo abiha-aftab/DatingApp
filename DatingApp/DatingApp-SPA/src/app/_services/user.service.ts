@@ -20,13 +20,15 @@ export class UserService {
     page?,
     itemsPerPage?,
     userParams?,
-    likesParam?
+    likesParam?,
+    blockParam?
   ): Observable<PaginatedResult<User[]>> {
     const paginatedResult: PaginatedResult<User[]> = new PaginatedResult<
       User[]
     >();
 
     let params = new HttpParams();
+    console.log('user service got ' + blockParam);
 
     if (page != null && itemsPerPage != null) {
       params = params.append('pageNumber', page);
@@ -44,8 +46,22 @@ export class UserService {
     }
 
     if (likesParam === 'Likees') {
+      console.log('user service is working likes');
       params = params.append('Likees', 'true');
     }
+    if (likesParam === 'Dislikers') {
+      params = params.append('Dislikers', 'true');
+    }
+
+    if (likesParam === 'Dislikees') {
+      params = params.append('Dislikees', 'true');
+    }
+
+    if (blockParam === 'blockees') {
+      console.log('user service is working');
+      params = params.append('blockees', 'true');
+    }
+
     return this.http
       .get<User[]>(this.baseUrl + 'users', { observe: 'response', params })
       .pipe(
@@ -83,6 +99,19 @@ export class UserService {
   sendLike(id: number, recepientId: number) {
     return this.http.post(
       this.baseUrl + 'users/' + id + '/like/' + recepientId,
+      {}
+    );
+  }
+
+  unblock(id: number, recepientId: number) {
+    return this.http.post(
+      this.baseUrl + 'users/' + id + '/unblock/' + recepientId,
+      {}
+    );
+  }
+  sendDislike(id: number, recepientId: number) {
+    return this.http.post(
+      this.baseUrl + 'users/' + id + '/dislike/' + recepientId,
       {}
     );
   }
@@ -133,6 +162,20 @@ export class UserService {
   deleteMessage(id: number, userId: number) {
     return this.http.post(
       this.baseUrl + 'users/' + userId + '/messages/' + id,
+      {}
+    );
+  }
+
+  deleteMessages(id: number, userId: number) {
+    return this.http.post(
+      this.baseUrl + 'users/' + userId + '/messages/' + id + '/both',
+      {}
+    );
+  }
+
+  blockUser(id: number, recepientId: number) {
+    return this.http.post(
+      this.baseUrl + 'users/' + id + '/block/' + recepientId,
       {}
     );
   }

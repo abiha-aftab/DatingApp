@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace DatingApp.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IMapper _mapper;
+
 
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
@@ -85,6 +87,7 @@ namespace DatingApp.API.Controllers
                 user
             });
         }
+
 
     }
 }

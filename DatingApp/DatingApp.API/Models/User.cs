@@ -27,6 +27,13 @@ namespace DatingApp.API.Models
         public ICollection<Like> Likees { get; set; }
         public ICollection<Like> Likers { get; set; }
 
+
+        public ICollection<Dislike> Dislikees { get; set; }
+        public ICollection<Dislike> Dislikers { get; set; }
+
+
+        public ICollection<Block> Blockees { get; set; }
+        public ICollection<Block> Blockers { get; set; }
         public ICollection<Message> MessagesSent { get; set; }
         public ICollection<Message> MessagesReceived { get; set; }
     }

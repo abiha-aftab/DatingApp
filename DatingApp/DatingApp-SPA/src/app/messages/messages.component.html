@@ -72,7 +72,15 @@
             (click)="$event.stopPropagation()"
             (click)="deleteMessage(message.id)"
           >
-            Delete
+            Delete for me
+          </button>
+          <button
+            [disabled]="!(message.senderId == uId)"
+            class="btn btn-danger mt-2"
+            (click)="$event.stopPropagation()"
+            (click)="deleteMessages(message.id)"
+          >
+            Delete for everyone
           </button>
         </td>
       </tr>

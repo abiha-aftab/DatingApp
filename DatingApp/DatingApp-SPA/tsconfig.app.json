@@ -3,7 +3,11 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": ["googlemaps"],
+    "typeRoots": ["./node_modules/@types/"]
+  },
+  "angularCompilerOptions": {
+    "enableIvy": false
   },
   "files": ["src/main.ts", "src/polyfills.ts"],
   "include": ["src/**/*.d.ts"]

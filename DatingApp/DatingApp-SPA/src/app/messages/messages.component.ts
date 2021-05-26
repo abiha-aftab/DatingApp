@@ -16,6 +16,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class MessagesComponent implements OnInit {
   messages: Message[];
+  uId: number;
   pagination: Pagination;
   messageContainer = 'Unread';
 
@@ -30,6 +31,7 @@ export class MessagesComponent implements OnInit {
     this.route.data.subscribe((data) => {
       this.messages = data['messages'].result;
       this.pagination = data['messages'].pagination;
+      this.uId = this.authService.decodedToken.nameid;
     });
   }
 
@@ -58,6 +60,28 @@ export class MessagesComponent implements OnInit {
       () => {
         this.userService
           .deleteMessage(id, this.authService.decodedToken.nameid)
+          .subscribe(
+            () => {
+              this.messages.splice(
+                this.messages.findIndex((m) => m.id === id),
+                1
+              );
+              this.alertify.success('Message has been deleted');
+            },
+            (error) => {
+              this.alertify.error('Failed to delete the message');
+            }
+          );
+      }
+    );
+  }
+
+  deleteMessages(id: number) {
+    this.alertify.confirm(
+      'Are you sure you want to delete this message for everyone?',
+      () => {
+        this.userService
+          .deleteMessages(id, this.authService.decodedToken.nameid)
           .subscribe(
             () => {
               this.messages.splice(

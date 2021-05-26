@@ -8,10 +8,12 @@ import { AuthGuard } from './_guards/auth.guard';
 import { MemberDetailResolver } from './_resolvers/member-detail.resolver';
 import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { MemberListResolver } from './_resolvers/member-list.resolver';
+import { MemberBlockResolver } from './_resolvers/member-block.resolver';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 import { ListsResolver } from './_resolvers/lists.resolver';
 import { MessagesResolver } from './_resolvers/messages.resolver';
+import { MemberBlockComponent } from './members/member-block/member-block.component';
 
 export const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -45,6 +47,11 @@ export const appRoutes: Routes = [
         path: 'lists',
         component: ListsComponent,
         resolve: { users: ListsResolver },
+      },
+      {
+        path: 'usersBlocked',
+        component: MemberBlockComponent,
+        resolve: { users: MemberBlockResolver },
       },
     ],
   },

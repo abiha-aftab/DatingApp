@@ -9,14 +9,44 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DatingApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200827062834_MessageEntityAdded")]
-    partial class MessageEntityAdded
+    [Migration("20200908120311_BlockEntityAdded")]
+    partial class BlockEntityAdded
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.7");
+
+            modelBuilder.Entity("DatingApp.API.Models.Block", b =>
+                {
+                    b.Property<int>("BlockerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BlockeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("BlockerId", "BlockeeId");
+
+                    b.HasIndex("BlockeeId");
+
+                    b.ToTable("Blocks");
+                });
+
+            modelBuilder.Entity("DatingApp.API.Models.Dislike", b =>
+                {
+                    b.Property<int>("DislikerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DislikeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("DislikerId", "DislikeeId");
+
+                    b.HasIndex("DislikeeId");
+
+                    b.ToTable("Dislikes");
+                });
 
             modelBuilder.Entity("DatingApp.API.Models.Like", b =>
                 {
@@ -50,6 +80,9 @@ namespace DatingApp.API.Migrations
 
                     b.Property<DateTime>("MessageSent")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("ReceipientDeleteForEveryone")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("RecipientDeleted")
                         .HasColumnType("INTEGER");
@@ -165,6 +198,36 @@ namespace DatingApp.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Values");
+                });
+
+            modelBuilder.Entity("DatingApp.API.Models.Block", b =>
+                {
+                    b.HasOne("DatingApp.API.Models.User", "Blockee")
+                        .WithMany("Blockers")
+                        .HasForeignKey("BlockeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DatingApp.API.Models.User", "Blocker")
+                        .WithMany("Blockees")
+                        .HasForeignKey("BlockerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DatingApp.API.Models.Dislike", b =>
+                {
+                    b.HasOne("DatingApp.API.Models.User", "Dislikee")
+                        .WithMany("Dislikers")
+                        .HasForeignKey("DislikeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DatingApp.API.Models.User", "Disliker")
+                        .WithMany("Dislikees")
+                        .HasForeignKey("DislikerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DatingApp.API.Models.Like", b =>

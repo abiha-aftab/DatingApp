@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using AutoMapper;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace DatingApp.API
 {
@@ -40,8 +41,8 @@ namespace DatingApp.API
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DeafultConnection")));
             services.AddControllers()
             .AddJsonOptions(options =>
-           options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
-        ;
+           options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
             services.AddCors();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddAutoMapper(typeof(DatingRepository).Assembly);

@@ -51,6 +51,22 @@ namespace DatingApp.API.Data
             return user;
         }
 
+        private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
+        {
+            var user = await _context.Users
+                .Include(x => x.Likers)
+                .Include(x => x.Likees)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (likers)
+            {
+                return user.Likers.Where(u => u.LikeeId == id).Select(i => i.LikerId);
+            }
+            else
+            {
+                return user.Likees.Where(u => u.LikerId == id).Select(i => i.LikeeId);
+            }
+        }
         public async Task<PagedList<User>> GetUsers(UserParams userParams)
         {
             var users = _context.Users.Include(p => p.Photos).OrderByDescending(u => u.LastActive).AsQueryable();
@@ -71,6 +87,31 @@ namespace DatingApp.API.Data
                 users = users.Where(u => userLikees.Contains(u.Id));
             }
 
+            if (userParams.Blockers)
+            {
+                var userBlockers = await GetUserBlocks(userParams.UserId, userParams.Blockers);
+                users = users.Where(u => !(userBlockers.Contains(u.Id)));
+                Console.WriteLine("Blocker" + users);
+            }
+
+            if (userParams.Blockees)
+            {
+                var userBlockers = await GetUserBlocks(userParams.UserId, userParams.Blockers);
+                users = users.Where(u => (userBlockers.Contains(u.Id)));
+                Console.WriteLine("Blocker" + users);
+            }
+
+            if (userParams.Dislikers)
+            {
+                var userDislikers = await GetUserDislikes(userParams.UserId, userParams.Dislikers);
+                users = users.Where(u => userDislikers.Contains(u.Id));
+            }
+
+            if (userParams.Dislikees)
+            {
+                var userDislikees = await GetUserDislikes(userParams.UserId, userParams.Dislikers);
+                users = users.Where(u => userDislikees.Contains(u.Id));
+            }
 
             if (userParams.MinAge != 18 || userParams.MaxAge != 99)
             {
@@ -97,22 +138,24 @@ namespace DatingApp.API.Data
         }
 
 
-        private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
+
+        private async Task<IEnumerable<int>> GetUserDislikes(int id, bool dislikers)
         {
             var user = await _context.Users
-                .Include(x => x.Likers)
-                .Include(x => x.Likees)
+                .Include(x => x.Dislikers)
+                .Include(x => x.Dislikees)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            if (likers)
+            if (dislikers)
             {
-                return user.Likers.Where(u => u.LikeeId == id).Select(i => i.LikerId);
+                return user.Dislikers.Where(u => u.DislikeeId == id).Select(i => i.DislikerId);
             }
             else
             {
-                return user.Likees.Where(u => u.LikerId == id).Select(i => i.LikeeId);
+                return user.Dislikees.Where(u => u.DislikerId == id).Select(i => i.DislikeeId);
             }
         }
+
         public Task GetUsers(object userParams)
         {
             throw new System.NotImplementedException();
@@ -171,6 +214,73 @@ namespace DatingApp.API.Data
                  .ToListAsync();
 
             return messages;
+        }
+
+        public async Task<Dislike> GetDislike(int userId, int recepientId)
+        {
+            return await _context.Dislikes.FirstOrDefaultAsync(u =>
+           u.DislikerId == userId & u.DislikeeId == recepientId
+             );
+        }
+
+        public async Task DelLike(int userId, int recepientId)
+        {
+            var user = await _context.Likes.FirstOrDefaultAsync(u =>
+             u.LikerId == userId & u.LikeeId == recepientId
+              );
+            if (user != null)
+                _context.Remove(user);
+        }
+
+        public async Task DelDislike(int userId, int recepientId)
+        {
+            var user = await _context.Dislikes.FirstOrDefaultAsync(u =>
+             u.DislikerId == userId & u.DislikeeId == recepientId
+              );
+            if (user != null)
+                _context.Remove(user);
+        }
+
+        public async Task DelUser(int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.Id == userId
+             );
+            if (user != null)
+                _context.Remove(user);
+        }
+
+        public async Task<Block> GetBlock(int userId, int recepientId)
+        {
+            return await _context.Blocks.FirstOrDefaultAsync(u =>
+         u.BlockerId == userId & u.BlockeeId == recepientId
+           );
+        }
+        public async Task<IEnumerable<int>> GetUserBlocks(int userId, bool blockers)
+        {
+            var user = await _context.Users
+                .Include(x => x.Blockers)
+                .Include(x => x.Blockees)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (blockers)
+            {
+                return user.Blockees.Where(u => u.BlockerId == userId).Select(i => i.BlockeeId);
+
+            }
+            else
+            {
+                return user.Blockees.Where(u => u.BlockerId == userId).Select(i => i.BlockeeId);
+            }
+        }
+
+        public async Task DelBlock(int userId, int recepientId)
+        {
+            var block = await _context.Blocks.FirstOrDefaultAsync(u =>
+            u.BlockerId == userId & u.BlockeeId == recepientId
+             );
+            if (block != null)
+                _context.Remove(block);
         }
     }
 }

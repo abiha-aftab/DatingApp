@@ -3,33 +3,20 @@ using System;
 using DatingApp.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DatingApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200908065629_AddedDislikeEntity")]
+    partial class AddedDislikeEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.7");
-
-            modelBuilder.Entity("DatingApp.API.Models.Block", b =>
-                {
-                    b.Property<int>("BlockerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("BlockeeId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("BlockerId", "BlockeeId");
-
-                    b.HasIndex("BlockeeId");
-
-                    b.ToTable("Blocks");
-                });
 
             modelBuilder.Entity("DatingApp.API.Models.Dislike", b =>
                 {
@@ -196,21 +183,6 @@ namespace DatingApp.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Values");
-                });
-
-            modelBuilder.Entity("DatingApp.API.Models.Block", b =>
-                {
-                    b.HasOne("DatingApp.API.Models.User", "Blockee")
-                        .WithMany("Blockers")
-                        .HasForeignKey("BlockeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DatingApp.API.Models.User", "Blocker")
-                        .WithMany("Blockees")
-                        .HasForeignKey("BlockerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("DatingApp.API.Models.Dislike", b =>

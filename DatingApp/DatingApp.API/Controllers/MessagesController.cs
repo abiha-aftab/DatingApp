@@ -32,6 +32,7 @@ namespace DatingApp.API.Controllers
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
 
+
             var messageFromRepo = await _repo.GetMessage(id);
 
             if (messageFromRepo == null)
@@ -123,6 +124,40 @@ namespace DatingApp.API.Controllers
 
             if (await _repo.SaveAll())
                 return NoContent();
+
+            throw new Exception("Error deleting the message");
+        }
+
+
+        [HttpPost("{id}/both")]
+        public async Task<IActionResult> DeleteMessages(int id, int userId)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            var messageFromRepo = await _repo.GetMessage(id);
+
+            if (messageFromRepo == null)
+            {
+                return NotFound();
+            }
+            if (userId != null)
+            {
+                messageFromRepo.SenderDeleted = true;
+                messageFromRepo.RecipientDeleted = true;
+                _repo.Delete(messageFromRepo);
+            }
+
+            if (messageFromRepo.SenderId == userId)
+                messageFromRepo.SenderDeleted = true;
+
+            if (messageFromRepo.RecipientId == userId)
+                messageFromRepo.RecipientDeleted = true;
+
+            if (messageFromRepo.SenderDeleted && messageFromRepo.RecipientDeleted)
+
+                if (await _repo.SaveAll())
+                    return NoContent();
 
             throw new Exception("Error deleting the message");
         }

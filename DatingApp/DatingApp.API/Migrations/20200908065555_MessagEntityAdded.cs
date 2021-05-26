@@ -3,10 +3,34 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DatingApp.API.Migrations
 {
-    public partial class MessageEntityAdded : Migration
+    public partial class MessagEntityAdded : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Dislikes",
+                columns: table => new
+                {
+                    DislikerId = table.Column<int>(nullable: false),
+                    DislikeeId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Dislikes", x => new { x.DislikerId, x.DislikeeId });
+                    table.ForeignKey(
+                        name: "FK_Dislikes_Users_DislikeeId",
+                        column: x => x.DislikeeId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Dislikes_Users_DislikerId",
+                        column: x => x.DislikerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Messages",
                 columns: table => new
@@ -20,7 +44,8 @@ namespace DatingApp.API.Migrations
                     DateRead = table.Column<DateTime>(nullable: true),
                     MessageSent = table.Column<DateTime>(nullable: false),
                     SenderDeleted = table.Column<bool>(nullable: false),
-                    RecipientDeleted = table.Column<bool>(nullable: false)
+                    RecipientDeleted = table.Column<bool>(nullable: false),
+                    ReceipientDeleteForEveryone = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -40,6 +65,11 @@ namespace DatingApp.API.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Dislikes_DislikeeId",
+                table: "Dislikes",
+                column: "DislikeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_RecipientId",
                 table: "Messages",
                 column: "RecipientId");
@@ -52,6 +82,9 @@ namespace DatingApp.API.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Dislikes");
+
             migrationBuilder.DropTable(
                 name: "Messages");
         }

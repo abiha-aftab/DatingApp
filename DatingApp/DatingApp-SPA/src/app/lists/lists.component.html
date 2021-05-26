@@ -1,7 +1,13 @@
 <div class="text-center mt-3">
   <h2>
     {{
-      likesParam === "Likers" ? "Members who like me" : "Members who I've Liked"
+      likesParam === "Likers"
+        ? "Members who like me"
+        : likesParam === "Likees"
+        ? "Members who I like"
+        : likesParam === "Dislikers"
+        ? "Members who dislike me"
+        : "Members who I dislike"
     }}
     : {{ pagination.totalItems }}
   </h2>
@@ -25,6 +31,23 @@
         (click)="loadUsers()"
       >
         Members who I like
+      </button>
+
+      <button
+        class="btn btn-primary"
+        [(ngModel)]="likesParam"
+        btnRadio="Dislikers"
+        (click)="loadUsers()"
+      >
+        Members who dislike me
+      </button>
+      <button
+        class="btn btn-primary"
+        [(ngModel)]="likesParam"
+        btnRadio="Dislikees"
+        (click)="loadUsers()"
+      >
+        Members who I dislike
       </button>
     </div>
   </div>

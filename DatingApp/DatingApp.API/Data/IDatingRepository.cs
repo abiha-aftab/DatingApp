@@ -20,6 +20,22 @@ namespace DatingApp.API.Data
 
         Task<Like> GetLike(int userId, int recepientId);
 
+        Task<Block> GetBlock(int userId, int recepientId);
+
+
+
+        Task<IEnumerable<int>> GetUserBlocks(int userId, bool blockers);
+
+        Task DelLike(int userId, int recepientId);
+
+        Task DelDislike(int userId, int recepientId);
+
+
+        Task DelBlock(int userId, int recepientId);
+        Task DelUser(int userId);
+
+        Task<Dislike> GetDislike(int userId, int recepientId);
+
         Task<Message> GetMessage(int id);
         Task<PagedList<Message>> GetMessagesForUser(MessageParams messageParams);
 

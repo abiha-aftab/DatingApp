@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { AuthService } from '../_services/auth.service';
+import { HelperService } from '../_services/helper.service';
+/// <reference path="_services/auth.service.ts" />
 import { AlertifyService } from '../_services/alertify.service';
+
 import {
   FormGroup,
   FormControl,
@@ -10,6 +12,11 @@ import {
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { User } from '../_models/user';
 import { Router } from '@angular/router';
+import {
+  AuthService,
+  FacebookLoginProvider,
+  GoogleLoginProvider,
+} from 'angular-6-social-login-v2';
 
 @Component({
   selector: 'app-register',
@@ -23,10 +30,11 @@ export class RegisterComponent implements OnInit {
   bsConfig: Partial<BsDatepickerConfig>;
 
   constructor(
-    private authService: AuthService,
+    private authService: HelperService,
     private router: Router,
     private alertify: AlertifyService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private socialAuthService: AuthService
   ) {}
 
   // tslint:disable-next-line: typedef
@@ -40,24 +48,66 @@ export class RegisterComponent implements OnInit {
   createRegisterForm() {
     this.registerForm = this.fb.group(
       {
-        gender: ['male'],
+        gender: ['female'],
         username: ['', Validators.required],
         knownAs: ['', Validators.required],
-        dateOfBirth: [null, Validators.required],
-        city: ['', Validators.required],
-        country: ['', Validators.required],
+        dateOfBirth: [new Date(), Validators.required],
+        city: ['Lahore', Validators.required],
+        country: ['Pakistan', Validators.required],
         password: [
-          '',
+          'password',
           [
             Validators.required,
             Validators.minLength(4),
             Validators.maxLength(8),
           ],
         ],
-        confirmPassword: ['', Validators.required],
+        confirmPassword: ['password', Validators.required],
       },
       { validator: this.passwordMatchValidator }
     );
+  }
+
+  public socialSignIn(socialPlatform: string) {
+    let socialPlatformProvider;
+    if (socialPlatform == 'facebook') {
+      socialPlatformProvider = FacebookLoginProvider.PROVIDER_ID;
+    } else if (socialPlatform == 'google') {
+      socialPlatformProvider = GoogleLoginProvider.PROVIDER_ID;
+    }
+
+    this.socialAuthService.signIn(socialPlatformProvider).then((userData) => {
+      this.user = Object.assign({}, this.registerForm.value);
+      console.log(socialPlatform + ' sign in data : ', userData);
+      this.user.username = userData.name;
+      this.user.photoUrl = userData.image;
+      this.user.knownAs = userData.name;
+
+      this.authService.changeMemberPhoto(userData.image);
+      console.log(this.user);
+      this.authService.register(this.user).subscribe(
+        () => {
+          this.alertify.success('Registeration Successful, login to proceed');
+        },
+        (error) => {
+          this.alertify.error(error);
+        }
+      );
+    });
+  }
+  register() {
+    if (this.registerForm.valid) {
+      this.user = Object.assign({}, this.registerForm.value);
+      console.log(this.user);
+      this.authService.register(this.user).subscribe(
+        () => {
+          this.alertify.success('Registeration Successful, login to proceed');
+        },
+        (error) => {
+          this.alertify.error(error);
+        }
+      );
+    }
   }
 
   passwordMatchValidator(g: FormGroup) {
@@ -67,24 +117,6 @@ export class RegisterComponent implements OnInit {
   }
 
   // tslint:disable-next-line: typedef
-  register() {
-    if (this.registerForm.valid) {
-      this.user = Object.assign({}, this.registerForm.value);
-      this.authService.register(this.user).subscribe(
-        () => {
-          this.alertify.success('Registeration Successful');
-        },
-        (error) => {
-          this.alertify.error(error);
-        },
-        () => {
-          this.authService.login(this.user).subscribe(() => {
-            this.router.navigate(['/members']);
-          });
-        }
-      );
-    }
-  }
 
   // tslint:disable-next-line: typedef
   cancel() {
