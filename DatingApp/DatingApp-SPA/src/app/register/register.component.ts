@@ -84,7 +84,7 @@ export class RegisterComponent implements OnInit {
       this.user.knownAs = userData.name;
 
       this.authService.changeMemberPhoto(userData.image);
-      console.log(this.user);
+      
       this.authService.register(this.user).subscribe(
         () => {
           this.alertify.success('Registeration Successful, login to proceed');
